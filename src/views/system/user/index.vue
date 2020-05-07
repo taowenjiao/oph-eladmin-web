@@ -1,14 +1,14 @@
 <template>
   <div class="app-container">
     <el-row :gutter="20">
-      <!--侧边部门数据-->
+      <!--侧边养老院数据-->
       <el-col :xs="9" :sm="6" :md="4" :lg="4" :xl="4">
         <div class="head-container">
           <el-input
             v-model="deptName"
             clearable
             size="small"
-            placeholder="输入部门名称搜索"
+            placeholder="输入养老院名称搜索"
             prefix-icon="el-icon-search"
             class="filter-item"
             @input="getDeptDatas"
@@ -83,19 +83,29 @@
             <el-form-item label="邮箱" prop="email">
               <el-input v-model="form.email" />
             </el-form-item>
-            <el-form-item label="部门" prop="dept.id">
+            <el-form-item label="养老院" prop="dept.id">
               <treeselect
                 v-model="form.dept.id"
                 :options="depts"
                 style="width: 178px"
-                placeholder="选择部门"
+                placeholder="选择养老院"
                 @select="selectFun"
               />
             </el-form-item>
-            <el-form-item label="岗位" prop="job.id">
-              <el-select v-model="form.job.id" style="width: 178px" placeholder="请先选择部门">
+            <el-form-item label="养老院角色" prop="job.id">
+              <el-select v-model="form.job.id" style="width: 178px" placeholder="请先选择养老院">
                 <el-option
                   v-for="(item, index) in jobs"
+                  :key="item.name + index"
+                  :label="item.name"
+                  :value="item.id"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="房间" prop="room.id">
+              <el-select v-model="form.room.id" style="width: 178px" placeholder="请先选择养老院">
+                <el-option
+                  v-for="(item, index) in rooms"
                   :key="item.name + index"
                   :label="item.name"
                   :value="item.id"
@@ -149,7 +159,7 @@
           <el-table-column prop="sex" label="性别" />
           <el-table-column :show-overflow-tooltip="true" prop="phone" width="100" label="电话" />
           <el-table-column :show-overflow-tooltip="true" width="125" prop="email" label="邮箱" />
-          <el-table-column :show-overflow-tooltip="true" width="110" prop="dept" label="部门 / 岗位">
+          <el-table-column :show-overflow-tooltip="true" width="140" prop="dept" label="养老院 / 角色">
             <template slot-scope="scope">
               <div>{{ scope.row.dept.name }} / {{ scope.row.job.name }}</div>
             </template>
@@ -199,6 +209,7 @@ import { isvalidPhone } from '@/utils/validate'
 import { getDepts } from '@/api/system/dept'
 import { getAll, getLevel } from '@/api/system/role'
 import { getAllJob } from '@/api/system/job'
+import { getAllRoom } from '@/api/system/room'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
@@ -209,7 +220,7 @@ import { mapGetters } from 'vuex'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 let userRoles = []
-const defaultForm = { id: null, username: null, nickName: null, sex: '男', email: null, enabled: 'false', roles: [], job: { id: null }, dept: { id: null }, phone: null }
+const defaultForm = { id: null, username: null, nickName: null, sex: '男', email: null, enabled: 'false', roles: [], job: { id: null }, dept: { id: null }, room: { id: null }, phone: null }
 export default {
   name: 'User',
   components: { Treeselect, crudOperation, rrOperation, udOperation, pagination },
@@ -232,7 +243,7 @@ export default {
     }
     return {
       height: document.documentElement.clientHeight - 180 + 'px;',
-      deptName: '', depts: [], deptDatas: [], jobs: [], level: 3, roles: [],
+      deptName: '', depts: [], deptDatas: [], jobs: [], rooms: [], level: 3, roles: [],
       defaultProps: { children: 'children', label: 'name' },
       permission: {
         add: ['admin', 'user:add'],
@@ -319,6 +330,7 @@ export default {
     // 打开编辑弹窗前做的操作
     [CRUD.HOOK.beforeToEdit](crud, form) {
       this.getJobs(this.form.dept.id)
+      this.getRooms(this.form.dept.id)
       userRoles = []
       const roles = []
       form.roles.forEach(function(role, index) {
@@ -333,13 +345,13 @@ export default {
     [CRUD.HOOK.afterValidateCU](crud) {
       if (!crud.form.dept.id) {
         this.$message({
-          message: '部门不能为空',
+          message: '养老院不能为空',
           type: 'warning'
         })
         return false
       } else if (!crud.form.job.id) {
         this.$message({
-          message: '岗位不能为空',
+          message: '养老院角色不能为空',
           type: 'warning'
         })
         return false
@@ -353,7 +365,7 @@ export default {
       crud.form.roles = userRoles
       return true
     },
-    // 获取左侧部门数据
+    // 获取左侧养老院数据
     getDeptDatas() {
       const sort = 'id,desc'
       const params = { sort: sort }
@@ -362,13 +374,13 @@ export default {
         this.deptDatas = res.content
       })
     },
-    // 获取弹窗内部门数据
+    // 获取弹窗内养老院数据
     getDepts() {
       getDepts({ enabled: true }).then(res => {
         this.depts = res.content
       })
     },
-    // 切换部门
+    // 切换养老院
     handleNodeClick(data) {
       if (data.pid === 0) {
         this.query.deptId = null
@@ -399,16 +411,24 @@ export default {
         this.roles = res
       }).catch(() => { })
     },
-    // 获取弹窗内岗位数据
+    // 获取弹窗内养老院角色数据
     getJobs(id) {
       getAllJob(id).then(res => {
         this.jobs = res.content
       }).catch(() => { })
     },
-    // 点击部门搜索对应的岗位
+    // 获取弹窗内养老院房间数据
+    getRooms(id) {
+      getAllRoom(id).then(res => {
+        this.rooms = res.content
+      }).catch(() => { })
+    },
+    // 点击养老院搜索对应的养老院角色和房间号
     selectFun(node, instanceId) {
       this.getJobs(node.id)
       this.form.job.id = null
+      this.getRooms(node.id)
+      this.form.room.id = null
     },
     // 获取权限级别
     getRoleLevel() {

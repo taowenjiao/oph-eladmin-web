@@ -277,13 +277,13 @@ export default {
         }
       })
     },
-    // 获取部门数据
+    // 获取养老院数据
     getDepts() {
       getDepts({ enabled: true }).then(res => {
         this.depts = res.content
       })
     },
-    // 如果数据权限为自定义则获取部门数据
+    // 如果数据权限为自定义则获取养老院数据
     changeScope() {
       if (this.form.dataScope === '自定义') {
         this.getDepts()

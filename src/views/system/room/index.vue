@@ -36,7 +36,7 @@
       </el-table-column>
       <!--   编辑与删除   -->
       <el-table-column
-        v-permission="['admin','job:edit','job:del']"
+        v-permission="['admin','room:edit','room:del']"
         label="操作"
         width="130px"
         align="center"
@@ -53,12 +53,12 @@
     <!--分页组件-->
     <pagination />
     <!--表单渲染-->
-    <eForm :job-status="dict.job_status" />
+    <eForm :room-status="dict.room_status" />
   </div>
 </template>
 
 <script>
-import crudJob from '@/api/system/job'
+import crudRoom from '@/api/system/room'
 import eHeader from './module/header'
 import eForm from './module/form'
 import CRUD, { presenter } from '@crud/crud'
@@ -67,32 +67,32 @@ import pagination from '@crud/Pagination'
 import udOperation from '@crud/UD.operation'
 
 export default {
-  name: 'Job',
+  name: 'Room',
   components: { eHeader, eForm, crudOperation, pagination, udOperation },
   cruds() {
     return CRUD({
-      title: '养老院角色',
-      url: 'api/job',
+      title: '养老院房间',
+      url: 'api/room',
       sort: ['sort,asc', 'id,desc'],
-      crudMethod: { ...crudJob }
+      crudMethod: { ...crudRoom }
     })
   },
   mixins: [presenter()],
   // 数据字典
-  dicts: ['job_status'],
+  dicts: ['room_status'],
   data() {
     return {
       permission: {
-        add: ['admin', 'job:add'],
-        edit: ['admin', 'job:edit'],
-        del: ['admin', 'job:del']
+        add: ['admin', 'room:add'],
+        edit: ['admin', 'room:edit'],
+        del: ['admin', 'room:del']
       }
     }
   },
   methods: {
     // 改变状态
     changeEnabled(data, val) {
-      this.$confirm('此操作将 "' + this.dict.label.job_status[val] + '" ' + data.name + '养老院角色, 是否继续？', '提示', {
+      this.$confirm('此操作将 "' + this.dict.label.room_status[val] + '" ' + data.name + '养老院房间, 是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -100,7 +100,7 @@ export default {
         // eslint-disable-next-line no-undef
         crud.crudMethod.edit(data).then(() => {
           // eslint-disable-next-line no-undef
-          crud.notify(this.dict.label.job_status[val] + '成功', 'success')
+          crud.notify(this.dict.label.room_status[val] + '成功', 'success')
         }).catch(err => {
           data.enabled = !data.enabled
           console.log(err.data.message)

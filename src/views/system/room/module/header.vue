@@ -2,7 +2,7 @@
   <div
     v-if="crud.props.searchToggle"
   >
-    <el-input v-model="query.name" clearable size="small" placeholder="输入养老院角色名称搜索" style="width: 200px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+    <el-input v-model="query.name" clearable size="small" placeholder="输入房间名称搜索" style="width: 200px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
     <el-date-picker
       v-model="query.createTime"
       :default-time="['00:00:00','23:59:59']"
@@ -15,7 +15,7 @@
       end-placeholder="结束日期"
     />
     <el-select v-model="query.enabled" clearable size="small" placeholder="状态" class="filter-item" style="width: 90px" @change="crud.toQuery">
-      <el-option v-for="item in dict.dict.job_status" :key="item.value" :label="item.label" :value="item.value" />
+      <el-option v-for="item in dict.dict.room_status" :key="item.value" :label="item.label" :value="item.value" />
     </el-select>
     <rrOperation />
   </div>

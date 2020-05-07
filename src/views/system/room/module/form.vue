@@ -12,7 +12,7 @@
       :model="form"
       :rules="rules"
       size="small"
-      label-width="80px"
+      label-width="100px"
     >
       <el-form-item
         label="名称"
@@ -41,7 +41,7 @@
         prop="enabled"
       >
         <el-radio
-          v-for="item in jobStatus"
+          v-for="item in roomStatus"
           :key="item.id"
           v-model="form.enabled"
           :label="item.value === 'true'"
@@ -102,7 +102,7 @@ export default {
   components: { Treeselect },
   mixins: [form(defaultForm)],
   props: {
-    jobStatus: {
+    roomStatus: {
       type: Array,
       required: true
     }
