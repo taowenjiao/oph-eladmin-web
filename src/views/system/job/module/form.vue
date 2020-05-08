@@ -24,6 +24,15 @@
         />
       </el-form-item>
       <el-form-item
+        label="标识"
+        prop="flag"
+      >
+        <el-input
+          v-model="form.flag"
+          style="width: 370px;"
+        />
+      </el-form-item>
+      <el-form-item
         label="排序"
         prop="sort"
       >
@@ -92,6 +101,7 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 const defaultForm = {
   id: null,
   name: '',
+  flag: '',
   sort: 999,
   enabled: true,
   dept: {
@@ -113,6 +123,9 @@ export default {
       rules: {
         name: [
           { required: true, message: '请输入名称', trigger: 'blur' }
+        ],
+        flag: [
+          { required: true, message: '标识填写  前台：fd、老人：old、家属：fm、其他：ot', trigger: 'blur' }
         ],
         sort: [
           { required: true, message: '请输入序号', trigger: 'blur', type: 'number' }

@@ -3,6 +3,7 @@ import request from '@/utils/request'
 export function getAllRoom(deptId) {
   const params = {
     deptId,
+    enabled: true,
     page: 0,
     size: 9999
   }

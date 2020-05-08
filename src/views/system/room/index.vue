@@ -98,9 +98,10 @@ export default {
         type: 'warning'
       }).then(() => {
         // eslint-disable-next-line no-undef
-        crud.crudMethod.edit(data).then(() => {
+        // crud.crudMethod.edit(data).then(() => {
+        crudRoom.edit(data).then(res => {
           // eslint-disable-next-line no-undef
-          crud.notify(this.dict.label.room_status[val] + '成功', 'success')
+          this.crud.notify(this.dict.label.room_status[val] + '成功', 'success')
         }).catch(err => {
           data.enabled = !data.enabled
           console.log(err.data.message)

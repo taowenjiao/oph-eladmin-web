@@ -29,6 +29,9 @@
         <el-form-item label="名称" prop="name">
           <el-input v-model="form.name" style="width: 370px;" />
         </el-form-item>
+        <el-form-item label="编码" prop="ophNumber">
+          <el-input v-model="form.ophNumber" />
+        </el-form-item>
         <el-form-item v-if="form.pid !== 0" label="状态" prop="enabled">
           <el-radio v-for="item in dict.dept_status" :key="item.id" v-model="form.enabled" :label="item.value">{{ item.label }}</el-radio>
         </el-form-item>
@@ -45,6 +48,7 @@
     <el-table ref="table" v-loading="crud.loading" :tree-props="{children: 'children', hasChildren: 'hasChildren'}" default-expand-all :data="crud.data" row-key="id" @select="crud.selectChange" @select-all="crud.selectAllChange" @selection-change="crud.selectionChangeHandler">
       <el-table-column :selectable="checkboxT" type="selection" width="55" />
       <el-table-column label="名称" prop="name" />
+      <el-table-column label="编码" prop="ophNumber" />
       <el-table-column label="状态" align="center" prop="enabled">
         <template slot-scope="scope">
           <el-switch
@@ -84,7 +88,7 @@ import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
 import udOperation from '@crud/UD.operation'
 
-const defaultForm = { id: null, name: null, pid: 1, enabled: 'true' }
+const defaultForm = { id: null, name: null, ophNumber: null, pid: 1, enabled: 'true' }
 export default {
   name: 'Dept',
   components: { Treeselect, crudOperation, rrOperation, udOperation },
@@ -100,6 +104,9 @@ export default {
       rules: {
         name: [
           { required: true, message: '请输入名称', trigger: 'blur' }
+        ],
+        ophNumber: [
+          { required: true, message: '请输入养老院编码', trigger: 'blur' }
         ]
       },
       permission: {

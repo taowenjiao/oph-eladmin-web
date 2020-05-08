@@ -32,7 +32,7 @@
               v-model="query.blurry"
               clearable
               size="small"
-              placeholder="输入名称或者邮箱搜索"
+              placeholder="输入名称搜索"
               style="width: 200px;"
               class="filter-item"
               @keyup.enter.native="crud.toQuery"
@@ -79,9 +79,6 @@
             </el-form-item>
             <el-form-item label="昵称" prop="nickName">
               <el-input v-model="form.nickName" />
-            </el-form-item>
-            <el-form-item label="邮箱" prop="email">
-              <el-input v-model="form.email" />
             </el-form-item>
             <el-form-item label="养老院" prop="dept.id">
               <treeselect
@@ -158,7 +155,6 @@
           <el-table-column :show-overflow-tooltip="true" prop="nickName" label="昵称" />
           <el-table-column prop="sex" label="性别" />
           <el-table-column :show-overflow-tooltip="true" prop="phone" width="100" label="电话" />
-          <el-table-column :show-overflow-tooltip="true" width="125" prop="email" label="邮箱" />
           <el-table-column :show-overflow-tooltip="true" width="140" prop="dept" label="养老院 / 角色">
             <template slot-scope="scope">
               <div>{{ scope.row.dept.name }} / {{ scope.row.job.name }}</div>
@@ -220,7 +216,7 @@ import { mapGetters } from 'vuex'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 let userRoles = []
-const defaultForm = { id: null, username: null, nickName: null, sex: '男', email: null, enabled: 'false', roles: [], job: { id: null }, dept: { id: null }, room: { id: null }, phone: null }
+const defaultForm = { id: null, username: null, nickName: null, sex: '男', enabled: 'false', roles: [], job: { id: null }, dept: { id: null }, room: { id: null }, phone: null }
 export default {
   name: 'User',
   components: { Treeselect, crudOperation, rrOperation, udOperation, pagination },
@@ -262,10 +258,6 @@ export default {
         nickName: [
           { required: true, message: '请输入用户昵称', trigger: 'blur' },
           { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
-        ],
-        email: [
-          { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-          { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
         ],
         phone: [
           { required: true, trigger: 'blur', validator: validPhone }

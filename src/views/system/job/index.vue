@@ -9,6 +9,7 @@
     <el-table ref="table" v-loading="crud.loading" :data="crud.data" style="width: 100%;" @selection-change="crud.selectionChangeHandler">
       <el-table-column type="selection" width="55" />
       <el-table-column prop="name" label="名称" />
+      <el-table-column prop="flag" label="标识" />
       <el-table-column prop="dept" label="所属养老院">
         <template slot-scope="scope">
           <div>{{ scope.row.deptSuperiorName ? scope.row.deptSuperiorName + ' / ' : '' }}{{ scope.row.dept.name }}</div>
@@ -98,9 +99,10 @@ export default {
         type: 'warning'
       }).then(() => {
         // eslint-disable-next-line no-undef
-        crud.crudMethod.edit(data).then(() => {
+        // crud.crudMethod.edit(data).then(() => {
+        crudJob.edit(data).then(res => {
           // eslint-disable-next-line no-undef
-          crud.notify(this.dict.label.job_status[val] + '成功', 'success')
+          this.crud.notify(this.dict.label.job_status[val] + '成功', 'success')
         }).catch(err => {
           data.enabled = !data.enabled
           console.log(err.data.message)
