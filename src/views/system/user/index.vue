@@ -90,7 +90,7 @@
               />
             </el-form-item>
             <el-form-item label="养老院角色" prop="job.id">
-              <el-select v-model="form.job.id" style="width: 178px" placeholder="请先选择养老院">
+              <el-select v-model="form.job.id" style="width: 178px" placeholder="请先选择养老院" @change="changeJobFlag(jobs,form.job.id)">
                 <el-option
                   v-for="(item, index) in jobs"
                   :key="item.name + index"
@@ -99,15 +99,11 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="房间" prop="room.id">
-              <el-select v-model="form.room.id" style="width: 178px" placeholder="请先选择养老院">
-                <el-option
-                  v-for="(item, index) in rooms"
-                  :key="item.name + index"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
+            <el-form-item v-if="form.jobFlag === 'old'" label="房间" prop="roomNumber">
+              <el-input v-model="form.roomNumber" placeholder="所属养老院房间号" />
+            </el-form-item>
+            <el-form-item v-if="form.jobFlag === 'fm'" label="老人电话" prop="parentFlag">
+              <el-input v-model.number="form.parentFlag" placeholder="所属老人手机号" />
             </el-form-item>
             <el-form-item label="性别">
               <el-radio-group v-model="form.sex" style="width: 178px">
@@ -216,7 +212,7 @@ import { mapGetters } from 'vuex'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 let userRoles = []
-const defaultForm = { id: null, username: null, nickName: null, sex: '男', enabled: 'false', roles: [], job: { id: null }, dept: { id: null }, room: { id: null }, phone: null }
+const defaultForm = { id: null, username: null, nickName: null, parentFlag: null, roomNumber: null, sex: '男', enabled: 'false', roles: [], job: { id: null }, dept: { id: null }, room: { id: null }, phone: null, jobFlag: null }
 export default {
   name: 'User',
   components: { Treeselect, crudOperation, rrOperation, udOperation, pagination },
@@ -261,6 +257,9 @@ export default {
         ],
         phone: [
           { required: true, trigger: 'blur', validator: validPhone }
+        ],
+        parentFlag: [
+          { required: false, trigger: 'blur', validator: validPhone }
         ]
       }
     }
@@ -347,7 +346,19 @@ export default {
           type: 'warning'
         })
         return false
-      } else if (this.roles.length === 0) {
+      } else if (this.form.jobFlag === 'old' && !crud.form.roomNumber) {
+        this.$message({
+          message: '老人用户，房间不能为空',
+          type: 'warning'
+        })
+        return false
+      } else if (this.form.jobFlag === 'fm' && !crud.form.parentFlag) {
+        this.$message({
+          message: '亲属用户，所属老人手机号不能为空',
+          type: 'warning'
+        })
+        return false
+      } else if (crud.form.roles.length === 0) {
         this.$message({
           message: '角色不能为空',
           type: 'warning'
@@ -430,6 +441,14 @@ export default {
     },
     checkboxT(row, rowIndex) {
       return row.id !== this.user.id
+    },
+    // 如果数据权限为自定义则获取养老院数据
+    changeJobFlag(jobList, jobId) {
+      for (const jobItem of jobList) {
+        if (jobItem.id === jobId) {
+          this.form.jobFlag = jobItem.flag
+        }
+      }
     }
   }
 }
