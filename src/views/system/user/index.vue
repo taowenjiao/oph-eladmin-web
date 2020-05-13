@@ -120,7 +120,7 @@
                 >{{ item.label }}</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item style="margin-bottom: 0;" label="角色" prop="roles">
+            <el-form-item label="角色" prop="roles">
               <el-select
                 v-model="form.roles"
                 style="width: 437px"
@@ -131,6 +131,24 @@
               >
                 <el-option
                   v-for="item in roles"
+                  :key="item.name"
+                  :disabled="level !== 1 && item.level <= level"
+                  :label="item.name"
+                  :value="item.id"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item style="margin-bottom: 0;" label="app菜单" prop="appMenus">
+              <el-select
+                v-model="form.appMenus"
+                style="width: 437px"
+                multiple
+                placeholder="请选择"
+                @remove-tag="deleteAppMenuTag"
+                @change="changeAppMenu"
+              >
+                <el-option
+                  v-for="item in appMenus"
                   :key="item.name"
                   :disabled="level !== 1 && item.level <= level"
                   :label="item.name"
@@ -198,6 +216,7 @@
 <script>
 import crudUser from '@/api/system/user'
 import { isvalidPhone } from '@/utils/validate'
+import { getAllAppMenus } from '@/api/system/tbAppMenu'
 import { getDepts } from '@/api/system/dept'
 import { getAll, getLevel } from '@/api/system/role'
 import { getAllJob } from '@/api/system/job'
@@ -212,7 +231,8 @@ import { mapGetters } from 'vuex'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 let userRoles = []
-const defaultForm = { id: null, username: null, nickName: null, parentFlag: null, roomNumber: null, sex: '男', enabled: 'false', roles: [], job: { id: null }, dept: { id: null }, room: { id: null }, phone: null, jobFlag: null }
+let userAppMenus = []
+const defaultForm = { id: null, username: null, nickName: null, parentFlag: null, roomNumber: null, sex: '男', enabled: 'false', roles: [], job: { id: null }, dept: { id: null }, room: { id: null }, phone: null, jobFlag: null, appMenus: [] }
 export default {
   name: 'User',
   components: { Treeselect, crudOperation, rrOperation, udOperation, pagination },
@@ -235,7 +255,7 @@ export default {
     }
     return {
       height: document.documentElement.clientHeight - 180 + 'px;',
-      deptName: '', depts: [], deptDatas: [], jobs: [], rooms: [], level: 3, roles: [],
+      deptName: '', depts: [], deptDatas: [], jobs: [], rooms: [], level: 3, roles: [], appMenus: [],
       defaultProps: { children: 'children', label: 'name' },
       permission: {
         add: ['admin', 'user:add'],
@@ -290,6 +310,13 @@ export default {
         userRoles.push(role)
       })
     },
+    changeAppMenu(value) {
+      userAppMenus = []
+      value.forEach(function(data, index) {
+        const appMenu = { id: data }
+        userAppMenus.push(appMenu)
+      })
+    },
     [CRUD.HOOK.afterAddError](crud) {
       this.afterErrorMethod(crud)
     },
@@ -303,6 +330,12 @@ export default {
         initRoles.push(role.id)
       })
       crud.form.roles = initRoles
+      //
+      const initAppMenus = []
+      initAppMenus.forEach(function(appMenu, index) {
+        initAppMenus.push(appMenu.id)
+      })
+      crud.form.appMenus = initAppMenus
     },
     deleteTag(value) {
       userRoles.forEach(function(data, index) {
@@ -311,10 +344,18 @@ export default {
         }
       })
     },
+    deleteAppMenuTag(value) {
+      userAppMenus.forEach(function(data, index) {
+        if (data.id === value) {
+          userAppMenus.splice(index, value)
+        }
+      })
+    },
     // 新增与编辑前做的操作
     [CRUD.HOOK.afterToCU](crud, form) {
       this.getDepts()
       this.getRoles()
+      this.getAppMenus()
       this.getRoleLevel()
       form.enabled = form.enabled.toString()
     },
@@ -331,6 +372,15 @@ export default {
         userRoles.push(rol)
       })
       form.roles = roles
+      userAppMenus = []
+      const appMenus = []
+      form.appMenus.forEach(function(appMenu, index) {
+        appMenus.push(appMenu.id)
+        // 初始化编辑时候的app菜单
+        const apm = { id: appMenu.id }
+        userAppMenus.push(apm)
+      })
+      form.appMenus = appMenus
     },
     // 提交前做的操作
     [CRUD.HOOK.afterValidateCU](crud) {
@@ -366,6 +416,7 @@ export default {
         return false
       }
       crud.form.roles = userRoles
+      crud.form.appMenus = userAppMenus
       return true
     },
     // 获取左侧养老院数据
@@ -412,6 +463,12 @@ export default {
     getRoles() {
       getAll().then(res => {
         this.roles = res
+      }).catch(() => { })
+    },
+    // 获取养老院数据
+    getAppMenus() {
+      getAllAppMenus().then(res => {
+        this.appMenus = res
       }).catch(() => { })
     },
     // 获取弹窗内养老院角色数据

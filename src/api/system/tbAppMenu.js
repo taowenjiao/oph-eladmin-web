@@ -1,16 +1,15 @@
 import request from '@/utils/request'
 
-export function getNotices(params) {
+// 获取所有的Role
+export function getAllAppMenus() {
   return request({
-    url: 'api/tbNotice',
-    method: 'get',
-    params
+    url: 'api/tbAppMenu/all',
+    method: 'get'
   })
 }
-
 export function add(data) {
   return request({
-    url: 'api/tbNotice',
+    url: 'api/tbAppMenu',
     method: 'post',
     data
   })
@@ -18,7 +17,7 @@ export function add(data) {
 
 export function del(ids) {
   return request({
-    url: 'api/tbNotice/',
+    url: 'api/tbAppMenu/',
     method: 'delete',
     data: ids
   })
@@ -26,10 +25,10 @@ export function del(ids) {
 
 export function edit(data) {
   return request({
-    url: 'api/tbNotice',
-    method: 'post',
+    url: 'api/tbAppMenu',
+    method: 'put',
     data
   })
 }
 
-export default { add, edit, del, getNotices }
+export default { add, edit, del }

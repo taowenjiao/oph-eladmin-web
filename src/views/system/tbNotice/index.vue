@@ -16,8 +16,8 @@
           size="small"
           class="date-item"
           value-format="yyyy-MM-dd HH:mm:ss"
-          start-placeholder="sendTimeStart"
-          end-placeholder="sendTimeEnd"
+          start-placeholder="发送开始时间"
+          end-placeholder="结束时间"
         />
         <el-date-picker
           v-model="query.createTime"
@@ -27,8 +27,8 @@
           size="small"
           class="date-item"
           value-format="yyyy-MM-dd HH:mm:ss"
-          start-placeholder="createTimeStart"
-          end-placeholder="createTimeEnd"
+          start-placeholder="开始时间"
+          end-placeholder="结束时间"
         />
         <rrOperation :crud="crud" />
       </div>
@@ -48,9 +48,6 @@
           <el-form-item label="通知内容" prop="notification">
             <el-input v-model="form.notification" :rows="3" type="textarea" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="发送目标">
-            未设置字典，请手动设置 Select
-          </el-form-item>
           <el-form-item label="发送时间" prop="sendType">
             <el-radio-group v-model="form.sendType" size="mini" style="width: 300px">
               <el-radio-button v-for="item in dict.notice_sendTime_status" :key="item.id" v-model="form.sendType" :label="item.value">{{ item.label }}</el-radio-button>
@@ -65,9 +62,9 @@
               />
             </div>
           </el-form-item>
-          <el-form-item label="4、自定义目标人群的id">
+          <!--<el-form-item label="4、自定义目标人群的id">
             <el-input v-model="form.userIds" style="width: 370px;" />
-          </el-form-item>
+          </el-form-item>-->
           <!--目标人员-->
           <el-form-item label="发送目标" prop="targetType">
             <el-radio-group v-model="form.targetType">
@@ -100,28 +97,18 @@
               label="名称"
               width="120"
             >
-              <template slot-scope="scope">{{ scope.row.username }}</template>
+              <template slot-scope="scope">{{ scope.row.nickName }}</template>
             </el-table-column>
-            <el-table-column
-              prop="ophNumber"
-              label="养老院"
-              width="120"
-            />
-            <el-table-column
-              prop="roomNumber"
-              label="房间号"
-              show-overflow-tooltip
-            />
+            <el-table-column :show-overflow-tooltip="true" width="140" prop="dept" label="养老院 / 角色">
+              <template slot-scope="scope">
+                <div>{{ scope.row.dept.name }} / {{ scope.row.job.name }}</div>
+              </template>
+            </el-table-column>
             <el-table-column
               prop="phone"
               label="手机号"
               show-overflow-tooltip
             />
-            <el-table-column prop="roleId">
-              <template slot-scope="scope">
-                <el-tag :type="scope.row.roleId | statusFilter">{{ scope.row.roleId==2? '老人' : '家属' }}</el-tag>
-              </template>
-            </el-table-column>
           </el-table>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -180,7 +167,8 @@ import udOperation from '@crud/UD.operation'
 import pagination from '@crud/Pagination'
 import { formatDate } from '@/utils/util'
 
-const defaultForm = { noticeId: null, title: null, notification: null, targetType: 1, platformType: 1, targetPopulation: null, sendType: 1, sendTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss') }
+const defaultForm = { id: null, title: null, notification: null, targetType: 1, platformType: 1,
+  targetPopulation: null, sendType: 1, sendTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss'), multipleUsers: [], userIds: null, dept: { id: null }}
 export default {
   name: 'TbNotice',
   components: { pagination, crudOperation, rrOperation, udOperation },
@@ -191,6 +179,7 @@ export default {
   },
   data() {
     return {
+      userList: [],
       notices: [],
       permission: {
         add: ['admin', 'tbNotice:add'],
@@ -217,7 +206,7 @@ export default {
   methods: {
     // 新增与编辑前做的操作
     [CRUD.HOOK.afterToCU]() {
-      // 获取所有养老院
+      // 获取改养老院下所有用户
       crudTbNotice.getNotices().then(res => {
         this.notices = res.content
       })
@@ -229,6 +218,11 @@ export default {
         this.crud.params[query.type] = query.value
       }
       return true
+    },
+    handleSelectionChange(val) {
+      this.from.multipleUsers = val
+      var ids = this.from.multipleUsers.map(item => item.id).join()
+      this.from.userIds = ids
     }
   }
 }
