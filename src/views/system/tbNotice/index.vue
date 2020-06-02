@@ -127,7 +127,7 @@
       <el-table ref="table" v-loading="crud.loading" :data="crud.data" size="small" style="width: 100%;" @selection-change="crud.selectionChangeHandler">
         <el-table-column type="selection" width="55" />
         <el-table-column prop="title" label="通知标题" />
-        <el-table-column prop="notification" label="通知内容" width="350px"/>
+        <el-table-column prop="notification" label="通知内容" width="350px" />
         <el-table-column prop="dept" label="所属养老院">
           <template slot-scope="scope">
             <div>{{ scope.row.deptSuperiorName ? scope.row.deptSuperiorName + ' / ' : '' }}{{ scope.row.dept.name }}</div>
