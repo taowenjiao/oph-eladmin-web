@@ -37,5 +37,15 @@ export function edit(data) {
     data
   })
 }
+export function getRoom(userId) {
+  const params = {
+    userId
+  }
+  return request({
+    url: 'api/room',
+    method: 'get',
+    params
+  })
+}
 
-export default { add, edit, del }
+export default { add, edit, del, getRoom }

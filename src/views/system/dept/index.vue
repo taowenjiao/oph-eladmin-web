@@ -35,7 +35,7 @@
         <el-form-item v-if="form.pid !== 0" label="状态" prop="enabled">
           <el-radio v-for="item in dict.dept_status" :key="item.id" v-model="form.enabled" :label="item.value">{{ item.label }}</el-radio>
         </el-form-item>
-        <el-form-item v-if="form.pid !== 0" style="margin-bottom: 0;" label="上级养老院" prop="pid">
+        <el-form-item v-if="form.pid !== 0" style="margin-bottom: 0;" label="上级" prop="pid">
           <treeselect v-model="form.pid" :options="depts" style="width: 370px;" placeholder="选择上级类目" />
         </el-form-item>
       </el-form>

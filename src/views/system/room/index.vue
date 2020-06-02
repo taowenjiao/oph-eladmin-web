@@ -14,6 +14,11 @@
           <div>{{ scope.row.deptSuperiorName ? scope.row.deptSuperiorName + ' / ' : '' }}{{ scope.row.dept.name }}</div>
         </template>
       </el-table-column>
+      <el-table-column prop="user" label="所属用户">
+        <template slot-scope="scope">
+          <div v-if="scope.row.user !== null">{{ scope.row.user.nickName }}</div>
+        </template>
+      </el-table-column>
       <el-table-column prop="sort" label="排序">
         <template slot-scope="scope">
           {{ scope.row.sort }}

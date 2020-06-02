@@ -95,7 +95,7 @@ const defaultForm = {
   sort: 999,
   enabled: true,
   dept: {
-    id: 1
+    id: null
   }
 }
 export default {

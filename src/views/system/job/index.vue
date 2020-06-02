@@ -54,7 +54,7 @@
     <!--分页组件-->
     <pagination />
     <!--表单渲染-->
-    <eForm :job-status="dict.job_status" />
+    <eForm :job-status="dict.job_status" :oph-role-type="dict.oph_role_type" />
   </div>
 </template>
 
@@ -80,7 +80,7 @@ export default {
   },
   mixins: [presenter()],
   // 数据字典
-  dicts: ['job_status'],
+  dicts: ['job_status', 'oph_role_type'],
   data() {
     return {
       permission: {

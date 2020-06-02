@@ -23,14 +23,17 @@
           style="width: 370px;"
         />
       </el-form-item>
-      <el-form-item
-        label="标识"
-        prop="flag"
-      >
-        <el-input
-          v-model="form.flag"
-          style="width: 370px;"
-        />
+      <el-form-item label="标识" prop="flag">
+        <el-radio-group v-model="form.flag">
+          <el-radio-button
+            v-for="item in ophRoleType"
+            :key="item.id"
+            v-model="form.flag"
+            :label="item.value"
+          >
+            {{ item.label }}
+          </el-radio-button>
+        </el-radio-group>
       </el-form-item>
       <el-form-item
         label="排序"
@@ -59,7 +62,7 @@
         </el-radio>
       </el-form-item>
       <el-form-item
-        label="所属养老院"
+        label="养老院"
         prop="dept.id"
         :rules="rules.dept"
       >
@@ -101,11 +104,11 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 const defaultForm = {
   id: null,
   name: '',
-  flag: '',
+  flag: 'fd',
   sort: 999,
   enabled: true,
   dept: {
-    id: 1
+    id: null
   }
 }
 export default {
@@ -113,6 +116,10 @@ export default {
   mixins: [form(defaultForm)],
   props: {
     jobStatus: {
+      type: Array,
+      required: true
+    },
+    ophRoleType: {
       type: Array,
       required: true
     }

@@ -80,7 +80,7 @@
             <el-form-item label="昵称" prop="nickName">
               <el-input v-model="form.nickName" />
             </el-form-item>
-            <el-form-item label="养老院" prop="dept.id">
+            <el-form-item label="养老院" prop="dept.id" :rules="rules.dept">
               <treeselect
                 v-model="form.dept.id"
                 :options="depts"
@@ -89,7 +89,7 @@
                 @select="selectFun"
               />
             </el-form-item>
-            <el-form-item label="养老院角色" prop="job.id">
+            <el-form-item label="养老院角色" prop="job.id" :rules="rules.job">
               <el-select v-model="form.job.id" style="width: 178px" placeholder="请先选择养老院" @change="changeJobFlag(jobs,form.job.id)">
                 <el-option
                   v-for="(item, index) in jobs"
@@ -99,10 +99,10 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item v-if="form.jobFlag === 'old'" label="房间" prop="roomNumber">
+            <el-form-item v-if="form.jobFlag === 'old' || form.job.flag === 'old'" label="房间" prop="roomNumber">
               <el-input v-model="form.roomNumber" placeholder="所属养老院房间号" />
             </el-form-item>
-            <el-form-item v-if="form.jobFlag === 'fm'" label="老人电话" prop="parentFlag">
+            <el-form-item v-if="form.jobFlag === 'fm'" label="亲属" prop="parentFlag">
               <el-input v-model.number="form.parentFlag" placeholder="所属老人手机号" />
             </el-form-item>
             <el-form-item label="性别">
@@ -168,8 +168,8 @@
           <el-table-column :show-overflow-tooltip="true" prop="username" label="用户名" />
           <el-table-column :show-overflow-tooltip="true" prop="nickName" label="昵称" />
           <el-table-column prop="sex" label="性别" />
-          <el-table-column :show-overflow-tooltip="true" prop="phone" width="100" label="电话" />
-          <el-table-column :show-overflow-tooltip="true" width="140" prop="dept" label="养老院 / 角色">
+          <el-table-column :show-overflow-tooltip="true" prop="phone" width="130" label="电话" />
+          <el-table-column :show-overflow-tooltip="true" width="170" prop="dept" label="养老院 / 角色">
             <template slot-scope="scope">
               <div>{{ scope.row.dept.name }} / {{ scope.row.job.name }}</div>
             </template>
@@ -220,7 +220,7 @@ import { getAllAppMenus } from '@/api/system/tbAppMenu'
 import { getDepts } from '@/api/system/dept'
 import { getAll, getLevel } from '@/api/system/role'
 import { getAllJob } from '@/api/system/job'
-import { getAllRoom } from '@/api/system/room'
+import { getAllRoom, getRoom } from '@/api/system/room'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
@@ -232,7 +232,7 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 let userRoles = []
 let userAppMenus = []
-const defaultForm = { id: null, username: null, nickName: null, parentFlag: null, roomNumber: null, sex: '男', enabled: 'false', roles: [], job: { id: null }, dept: { id: null }, room: { id: null }, phone: null, jobFlag: null, appMenus: [] }
+const defaultForm = { id: null, username: null, nickName: null, parentFlag: null, roomNumber: null, sex: '男', enabled: 'false', parentId: null, roles: [], job: { id: null }, dept: { id: null }, room: { id: null }, phone: null, jobFlag: null, appMenus: [] }
 export default {
   name: 'User',
   components: { Treeselect, crudOperation, rrOperation, udOperation, pagination },
@@ -255,7 +255,7 @@ export default {
     }
     return {
       height: document.documentElement.clientHeight - 180 + 'px;',
-      deptName: '', depts: [], deptDatas: [], jobs: [], rooms: [], level: 3, roles: [], appMenus: [],
+      deptName: '', depts: [], deptDatas: [], jobs: [], room: null, rooms: [], level: 3, roles: [], appMenus: [],
       defaultProps: { children: 'children', label: 'name' },
       permission: {
         add: ['admin', 'user:add'],
@@ -280,7 +280,9 @@ export default {
         ],
         parentFlag: [
           { required: false, trigger: 'blur', validator: validPhone }
-        ]
+        ],
+        dept: { required: true, message: '所属养老院不能为空', trigger: 'select' },
+        job: { required: true, message: '所属养老院角色不能为空', trigger: 'select' }
       }
     }
   },
@@ -362,7 +364,13 @@ export default {
     // 打开编辑弹窗前做的操作
     [CRUD.HOOK.beforeToEdit](crud, form) {
       this.getJobs(this.form.dept.id)
-      this.getRooms(this.form.dept.id)
+      // 根据userId查找房间号
+      if (this.form.job.flag === 'old') {
+        this.getRoom(this.form.id)
+      }
+      /* if (this.form.job.flag === 'fm') {
+        this.getUser(this.form.parentId)
+      } */
       userRoles = []
       const roles = []
       form.roles.forEach(function(role, index) {
@@ -478,16 +486,28 @@ export default {
       }).catch(() => { })
     },
     // 获取弹窗内养老院房间数据
+    getRoom(id) {
+      getRoom(id).then(res => {
+        this.form.roomNumber = res.content[0].name
+      }).catch(() => { })
+    },
+    // 获取弹窗内养老院房间数据
     getRooms(id) {
       getAllRoom(id).then(res => {
         this.rooms = res.content
+      }).catch(() => { })
+    },
+    // 根据id获取用户数据
+    getUser(id) {
+      crudUser.getUsers({ id: 66 }).then(res => {
+        this.form.parentFlag = res.content[0].phone
       }).catch(() => { })
     },
     // 点击养老院搜索对应的养老院角色和房间号
     selectFun(node, instanceId) {
       this.getJobs(node.id)
       this.form.job.id = null
-      this.getRooms(node.id)
+      // this.getRooms(node.id)
       this.form.room.id = null
     },
     // 获取权限级别

@@ -1,6 +1,13 @@
 import request from '@/utils/request'
 import { encrypt } from '@/utils/rsaEncrypt'
 
+export function getUsers(params) {
+  return request({
+    url: 'api/users',
+    method: 'get',
+    params
+  })
+}
 export function add(data) {
   return request({
     url: 'api/users',
@@ -57,5 +64,5 @@ export function updateEmail(form) {
   })
 }
 
-export default { add, edit, del }
+export default { add, edit, del, getUsers }
 
